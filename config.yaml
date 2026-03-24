@@ -1,0 +1,84 @@
+# ============================================================
+# Mine Dewatering Calculator — Project 2
+# Ref: Juan et al., Globe Vol.3 No.3, Agustus 2025
+# PT Bukit Baiduri Energi, Kutai Kartanegara, Kaltim
+# ============================================================
+
+project:
+  nama: "PT Bukit Baiduri Energi"
+  lokasi: "Pit Pinang A9, Kutai Kartanegara, Kalimantan Timur"
+  sump: "Sump A9 (elevasi -86 mdpl)"
+  referensi: "Juan et al., Globe Vol.3 No.3, Agustus 2025"
+  regulasi: "Kepmen ESDM No. 1827 K/30/MEM/2018"
+
+data:
+  rainfall_file: "data/rainfall_bbe_2014_2023.csv"
+  raintime_file: "data/raintime_forecast.csv"
+  pump_file: "data/pump_specs_mf385.csv"
+
+hidrologi:
+  periode_ulang: [2, 5, 10, 15]
+  periode_desain: 5             # tahun (Kepmen ESDM min untuk tambang <1 tahun)
+  metode_distribusi: "log_pearson_iii"
+
+catchment:
+  nama: "Pit Pinang"
+  luas_ha: 103.42
+  koef_limpasan: 0.90           # >15%, tanpa tumbuhan/daerah tambang (Gautama 1999)
+  kemiringan_pct: 15            # >15%
+
+# Waktu hujan dari data aktual (bukan asumsi)
+# Total raintime 845 jam/tahun / 366 hari = 2.35 jam/hari
+raintime:
+  total_jam_per_tahun: 845
+  total_hari_per_tahun: 366
+  tc_jam: 2.35                  # dihitung dari data, bukan asumsi
+
+# Debit air tanah (diukur langsung di lapangan)
+air_tanah:
+  Q_m3_per_hari: 69.12          # dari pengukuran lapangan
+  Q_m3_per_jam: 2.88
+
+# Kepmen ESDM 1827 — kapasitas sump
+kepmen_sump:
+  durasi_jam: 84                # curah hujan tertinggi selama 84 jam
+  safety_factor: 1.25           # minimal 1.25× volume air masuk
+  # Jurnal Tabel 6 pakai I=1.27 mm/jam untuk sizing sump
+  # (berbeda dari I=1.89 untuk debit limpasan)
+  # Ini R24 dari curah hujan harian rata-rata yang lebih rendah
+  I_sump_mm_per_jam: 1.27
+
+# Parameter pompa
+pompa:
+  jenis: "Multiflo MF-385H"
+  debit_aktual_m3_per_jam: 162.60   # diukur langsung lapangan (flowbar, RPM 1500)
+  debit_aktual_m3_per_hari: 2926.80
+  jam_kerja_per_hari: 18
+  rpm_operasi: 1600
+  panjang_pipa_m: 700
+  diameter_pipa_inch: 10
+  jenis_pipa: "HDPE"
+  target_hari: 25               # target pengeringan sump
+
+# Neraca air
+neraca_air:
+  suhu_rata_rata_C: 26
+  ch_rata_rata_mm_per_tahun: 2539.30
+  luas_sump_m2: 11381           # dihitung dari kapasitas sump / kedalaman
+  kedalaman_sump_m: 11
+  evaporasi_mm_per_tahun: 475.80
+  infiltrasi_mm_per_tahun: 146.40
+
+# Moving average forecast
+forecast:
+  window: 3                     # 3 tahun terakhir (2022-2024)
+  tahun_forecast: [2025, 2026]
+  # R24 operasional jurnal (back-calculated dari I=1.89, tc=2.35)
+  # Jurnal pakai pendekatan OPERASIONAL (rata-rata), bukan DESAIN (maksimum LP3)
+  R24_operasional: 9.655        # mm — menghasilkan I=1.89 mm/jam sesuai jurnal
+
+output:
+  dir: "output"
+  figures_dir: "output/figures"
+  excel_file: "output/dewatering_report_juan.xlsx"
+  pdf_file: "output/dewatering_report_juan.pdf"
